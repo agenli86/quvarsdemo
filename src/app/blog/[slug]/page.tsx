@@ -14,22 +14,25 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = createAdminClient()
-  const { data } = await supabase
+  const result = await supabase
     .from('blog_posts')
     .select('*')
     .eq('slug', params.slug)
     .single()
 
-  if (!data) return { title: 'Yazı bulunamadı' }
+  const data = result.data
+  if (!data) return { title: 'Yazi bulunamadi' }
+
+  const descVal = data.meta_description || data.excerpt || ''
 
   return {
     title: data.title,
-    description: data.meta_description || data.excerpt || '',
-    alternates: { canonical: `${SITE_URL}/blog/${data.slug}` },
+    description: descVal,
+    alternates: { canonical: SITE_URL + '/blog/' + data.slug },
     openGraph: {
       type: 'article',
       title: data.title,
-      description: data.meta_description || data.excerpt || '',
+      description: descVal,
       images: data.image_url ? [getImageUrl(data.image_url)] : [],
       publishedTime: data.published_at || data.created_at,
     },
@@ -38,22 +41,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const supabase = createAdminClient()
-  const { data } = await supabase.from('blog_posts').select('slug').eq('is_published', true)
-  return (data || []).map((b) => ({ slug: b.slug }))
+  const result = await supabase.from('blog_posts').select('slug').eq('is_published', true)
+  return (result.data || []).map(function(b) { return { slug: b.slug } })
 }
 
 export default async function BlogDetailPage({ params }: Props) {
   const supabase = createClient()
-  const { data: post } = await supabase
+  const result = await supabase
     .from('blog_posts')
     .select('*')
     .eq('slug', params.slug)
     .eq('is_published', true)
     .single()
 
+  const post = result.data
   if (!post) notFound()
 
-  const { data: related } = await supabase
+  const relatedResult = await supabase
     .from('blog_posts')
     .select('id, title, slug, excerpt, image_url, category, created_at, reading_time')
     .eq('is_published', true)
@@ -61,6 +65,7 @@ export default async function BlogDetailPage({ params }: Props) {
     .order('created_at', { ascending: false })
     .limit(3)
 
+  const related = relatedResult.data
   const heroImg = post.image_url ? getImageUrl(post.image_url) : 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1920&q=80'
   const date = new Date(post.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
 
@@ -84,7 +89,7 @@ export default async function BlogDetailPage({ params }: Props) {
             className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white mb-6 transition-colors w-fit"
           >
             <ArrowLeft size={16} />
-            <span>Blog&apos;a Dön</span>
+            <span>Bloga Don</span>
           </Link>
 
           {post.category && (
@@ -127,14 +132,14 @@ export default async function BlogDetailPage({ params }: Props) {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           ) : (
-            <p className="text-gray-500 italic">İçerik henüz hazırlanıyor.</p>
+            <p className="text-gray-500 italic">Icerik henuz hazirlaniyor.</p>
           )}
 
           <div className="mt-16 p-8 rounded-3xl bg-gradient-quvars-soft text-center">
             <h3 className="text-2xl font-heading font-medium text-lavender-900 mb-3">
-              Beğendiniz mi? Bizi takip edin
+              Begendiniz mi? Bizi takip edin
             </h3>
-            <p className="text-gray-600 mb-5">İlham veren içerikler için Instagram&apos;da bize katılın.</p>
+            <p className="text-gray-600 mb-5">Ilham veren icerikler icin Instagramda bize katilin.</p>
             <Link
               href="/randevu"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-quvars text-white text-sm font-semibold rounded-full shadow-soft hover:shadow-glow transition-all"
@@ -149,13 +154,13 @@ export default async function BlogDetailPage({ params }: Props) {
         <section className="py-12 md:py-16 bg-gradient-quvars-soft">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-heading font-medium text-lavender-900 mb-8 text-center">
-              İlgili Yazılar
+              Ilgili Yazilar
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {related.map((r) => (
                 <Link
                   key={r.id}
-                  href={`/blog/${r.slug}`}
+                  href={'/blog/' + r.slug}
                   className="group bg-white rounded-3xl overflow-hidden shadow-soft hover:shadow-soft-lg transition-all"
                 >
                   <div className="relative aspect-[16/10] overflow-hidden">
@@ -178,28 +183,6 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         </section>
       )}
-
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'Article',
-            headline: post.title,
-            description: post.meta_description || post.excerpt,
-            image: heroImg,
-            datePublished: post.published_at || post.created_at,
-            dateModified: post.updated_at,
-            author: { '@type': 'Organization', name: COMPANY.name },
-            publisher: {
-              '@type': 'Organization',
-              name: COMPANY.name,
-              logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
-            },
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${post.slug}` },
-          }),
-        }}
-      />
     </SiteLayout>
   )
 }
