@@ -1,0 +1,175 @@
+/* ========================================
+   ADMIN PANEL STYLES — Site ile karışmaz
+   ======================================== */
+
+.admin-wrapper {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f5f3fa;
+  min-height: 100vh;
+}
+
+.admin-wrapper * {
+  font-family: inherit;
+}
+
+.admin-sidebar {
+  background: linear-gradient(180deg, #3E2D66 0%, #553F8A 100%);
+  color: #e2e8f0;
+  width: 260px;
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 30;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  color: #c8b9e0;
+  font-size: 13.5px;
+  border-radius: 10px;
+  margin: 2px 10px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.admin-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+
+.admin-sidebar-link.active {
+  background: linear-gradient(135deg, #B89BF0 0%, #DD6189 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(184, 155, 240, 0.3);
+}
+
+.admin-main {
+  margin-left: 260px;
+  padding: 28px;
+  min-height: 100vh;
+}
+
+.admin-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #ece5f5;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(155, 123, 227, 0.06);
+}
+
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  white-space: nowrap;
+}
+
+.admin-btn-primary {
+  background: linear-gradient(135deg, #9D7BE3 0%, #B179D0 100%);
+  color: white;
+}
+.admin-btn-primary:hover {
+  background: linear-gradient(135deg, #8463CC 0%, #9461B5 100%);
+  box-shadow: 0 4px 14px rgba(155, 123, 227, 0.35);
+}
+
+.admin-btn-danger {
+  background: #DD6189;
+  color: white;
+}
+.admin-btn-danger:hover {
+  background: #C44872;
+}
+
+.admin-btn-secondary {
+  background: #f0eaf8;
+  color: #553F8A;
+}
+.admin-btn-secondary:hover {
+  background: #e5d8ff;
+}
+
+.admin-input {
+  width: 100%;
+  border: 1.5px solid #e0d5ed;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  background: #fff;
+}
+
+.admin-input:focus {
+  border-color: #9D7BE3;
+  box-shadow: 0 0 0 3px rgba(155, 123, 227, 0.12);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  background: #faf7ff;
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #6B4FAE;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 2px solid #ece5f5;
+}
+
+.admin-table td {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  color: #3E2D66;
+  border-bottom: 1px solid #f5f0fa;
+}
+
+.admin-table tr:hover td {
+  background: #faf7ff;
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.admin-badge-green { background: #dcfce7; color: #16a34a; }
+.admin-badge-red { background: #fee2e2; color: #dc2626; }
+.admin-badge-blue { background: #dbeafe; color: #1d4ed8; }
+.admin-badge-yellow { background: #fef9c3; color: #ca8a04; }
+.admin-badge-purple { background: #f3edff; color: #6B4FAE; }
+
+@media (max-width: 768px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+  .admin-main {
+    margin-left: 0;
+    padding: 16px;
+  }
+}
