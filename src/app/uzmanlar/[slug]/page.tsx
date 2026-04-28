@@ -4,8 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Instagram, Calendar, MessageCircle, Award } from 'lucide-react'
 import SiteLayout from '@/components/layout/SiteLayout'
-import PageHeader from '@/components/layout/PageHeader'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getImageUrl, SITE_URL, COMPANY } from '@/lib/constants'
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('specialists')
     .select('*')
@@ -25,6 +25,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: data.bio?.substring(0, 160) || '',
     alternates: { canonical: `${SITE_URL}/uzmanlar/${data.slug}` },
   }
+}
+
+export async function generateStaticParams() {
+  const supabase = createAdminClient()
+  const { data } = await supabase.from('specialists').select('slug').eq('is_active', true)
+  return (data || []).map((s) => ({ slug: s.slug }))
 }
 
 export default async function SpecialistDetailPage({ params }: Props) {
@@ -53,7 +59,6 @@ export default async function SpecialistDetailPage({ params }: Props) {
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
-            {/* Photo */}
             <div className="lg:col-span-1">
               <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-soft-lg">
                 <Image
@@ -67,7 +72,6 @@ export default async function SpecialistDetailPage({ params }: Props) {
               </div>
             </div>
 
-            {/* Info */}
             <div className="lg:col-span-2">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-4 bg-white/80 backdrop-blur rounded-full text-xs font-medium text-lavender-700 uppercase tracking-wider">
                 <Award size={12} />
@@ -107,7 +111,7 @@ export default async function SpecialistDetailPage({ params }: Props) {
                   <Calendar size={16} />
                   <span>Randevu Al</span>
                 </Link>
-                <a
+                
                   href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Merhaba, ${s.name} ile randevu almak istiyorum.`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -117,7 +121,7 @@ export default async function SpecialistDetailPage({ params }: Props) {
                   <span>WhatsApp</span>
                 </a>
                 {s.instagram_url && (
-                  <a
+                  
                     href={s.instagram_url}
                     target="_blank"
                     rel="noopener noreferrer"
