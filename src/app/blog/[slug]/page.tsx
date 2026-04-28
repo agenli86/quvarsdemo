@@ -2,9 +2,10 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Calendar, Clock, ArrowLeft, Share2, Tag } from 'lucide-react'
+import { Calendar, Clock, ArrowLeft, Tag } from 'lucide-react'
 import SiteLayout from '@/components/layout/SiteLayout'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getImageUrl, SITE_URL, COMPANY } from '@/lib/constants'
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('blog_posts')
     .select('*')
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const supabase = createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase.from('blog_posts').select('slug').eq('is_published', true)
   return (data || []).map((b) => ({ slug: b.slug }))
 }
@@ -65,7 +66,6 @@ export default async function BlogDetailPage({ params }: Props) {
 
   return (
     <SiteLayout>
-      {/* Cinematic blog hero */}
       <section className="relative h-[60vh] min-h-[420px] md:min-h-[520px] overflow-hidden bg-lavender-900">
         <Image
           src={heroImg}
@@ -130,7 +130,6 @@ export default async function BlogDetailPage({ params }: Props) {
             <p className="text-gray-500 italic">İçerik henüz hazırlanıyor.</p>
           )}
 
-          {/* Share / CTA */}
           <div className="mt-16 p-8 rounded-3xl bg-gradient-quvars-soft text-center">
             <h3 className="text-2xl font-heading font-medium text-lavender-900 mb-3">
               Beğendiniz mi? Bizi takip edin
@@ -146,7 +145,6 @@ export default async function BlogDetailPage({ params }: Props) {
         </div>
       </article>
 
-      {/* Related */}
       {related && related.length > 0 && (
         <section className="py-12 md:py-16 bg-gradient-quvars-soft">
           <div className="container mx-auto px-4">
@@ -181,7 +179,6 @@ export default async function BlogDetailPage({ params }: Props) {
         </section>
       )}
 
-      {/* Article Schema */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
