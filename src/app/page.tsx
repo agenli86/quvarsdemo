@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import SiteLayout from '@/components/layout/SiteLayout'
 import VideoHero from '@/components/home/VideoHero'
 import WelcomeSection from '@/components/home/WelcomeSection'
 import ServicesSection from '@/components/home/ServicesSection'
