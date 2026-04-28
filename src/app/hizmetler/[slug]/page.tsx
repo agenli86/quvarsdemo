@@ -1,7 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { Calendar, Clock, Tag, Phone, MessageCircle, Sparkles } from 'lucide-react'
 import SiteLayout from '@/components/layout/SiteLayout'
 import PageHeader from '@/components/layout/PageHeader'
@@ -136,7 +135,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                   <MessageCircle size={32} className="text-white mb-3" />
                   <h3 className="text-xl font-heading font-medium mb-1">Fiyat Bilgisi Al</h3>
                   <p className="text-sm text-white/90 mb-4 leading-relaxed">
-                    Anlık güncel fiyatlar ve kişiye özel paket teklifleri için WhatsApp'tan bize yazın.
+                    Anlık güncel fiyatlar ve kişiye özel paket teklifleri için WhatsApp&apos;tan bize yazın.
                   </p>
                   
                     href={whatsappLink}
@@ -145,7 +144,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                     className="inline-flex items-center gap-2 px-5 py-3 bg-white text-green-700 text-sm font-semibold rounded-full shadow hover:shadow-lg transition-all w-full justify-center"
                   >
                     <MessageCircle size={16} />
-                    <span>WhatsApp'tan Yaz</span>
+                    <span>WhatsApp&apos;tan Yaz</span>
                   </a>
                 </div>
 
