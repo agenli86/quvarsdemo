@@ -14,37 +14,46 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = createAdminClient()
-  const { data } = await supabase
+  const result = await supabase
     .from('specialists')
     .select('*')
     .eq('slug', params.slug)
     .single()
-  if (!data) return { title: 'Uzman bulunamadı' }
+
+  const data = result.data
+  if (!data) return { title: 'Uzman bulunamadi' }
+
+  const titlePart = data.title ? ' - ' + data.title : ''
+  const descVal = (data.bio || '').substring(0, 160)
+
   return {
-    title: `${data.name}${data.title ? ' - ' + data.title : ''}`,
-    description: data.bio?.substring(0, 160) || '',
-    alternates: { canonical: `${SITE_URL}/uzmanlar/${data.slug}` },
+    title: data.name + titlePart,
+    description: descVal,
+    alternates: { canonical: SITE_URL + '/uzmanlar/' + data.slug },
   }
 }
 
 export async function generateStaticParams() {
   const supabase = createAdminClient()
-  const { data } = await supabase.from('specialists').select('slug').eq('is_active', true)
-  return (data || []).map((s) => ({ slug: s.slug }))
+  const result = await supabase.from('specialists').select('slug').eq('is_active', true)
+  return (result.data || []).map(function(s) { return { slug: s.slug } })
 }
 
 export default async function SpecialistDetailPage({ params }: Props) {
   const supabase = createClient()
-  const { data: s } = await supabase
+  const result = await supabase
     .from('specialists')
     .select('*')
     .eq('slug', params.slug)
     .eq('is_active', true)
     .single()
 
+  const s = result.data
   if (!s) notFound()
 
   const img = s.image_url ? getImageUrl(s.image_url) : 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80'
+  const waText = encodeURIComponent('Merhaba, ' + s.name + ' ile randevu almak istiyorum.')
+  const waLink = 'https://wa.me/' + COMPANY.whatsapp + '?text=' + waText
 
   return (
     <SiteLayout>
@@ -86,7 +95,7 @@ export default async function SpecialistDetailPage({ params }: Props) {
 
               {s.specialties && s.specialties.length > 0 && (
                 <div className="mb-6">
-                  <div className="text-xs uppercase tracking-wider text-lavender-600 mb-3 font-semibold">Uzmanlık Alanları</div>
+                  <div className="text-xs uppercase tracking-wider text-lavender-600 mb-3 font-semibold">Uzmanlik Alanlari</div>
                   <div className="flex flex-wrap gap-2">
                     {s.specialties.map((sp: string) => (
                       <span key={sp} className="px-4 py-1.5 rounded-full bg-white border border-lavender-200 text-sm text-lavender-800">
@@ -112,7 +121,7 @@ export default async function SpecialistDetailPage({ params }: Props) {
                   <span>Randevu Al</span>
                 </Link>
                 
-                  href={`https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Merhaba, ${s.name} ile randevu almak istiyorum.`)}`}
+                  href={waLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-lavender-200 text-lavender-800 text-sm font-semibold rounded-full hover:border-lavender-400 transition-all"
