@@ -1,10 +1,12 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Calendar, Clock, Phone, MessageCircle, Sparkles, Tag } from 'lucide-react'
+import Image from 'next/image'
+import { Calendar, Clock, Tag, Phone, MessageCircle, Sparkles } from 'lucide-react'
 import SiteLayout from '@/components/layout/SiteLayout'
 import PageHeader from '@/components/layout/PageHeader'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getImageUrl, SITE_URL, COMPANY } from '@/lib/constants'
 import { getIcon } from '@/lib/icons'
 
@@ -13,7 +15,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const supabase = createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('services')
     .select('*')
@@ -23,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!data) return { title: 'Hizmet bulunamadı' }
 
   return {
-    title: data.title || `${data.name} - Kayseri`,
+    title: data.title || data.name,
     description: data.meta_description || data.short_description,
     alternates: { canonical: `${SITE_URL}/hizmetler/${data.slug}` },
     openGraph: {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const supabase = createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase.from('services').select('slug').eq('is_active', true)
   return (data || []).map((s) => ({ slug: s.slug }))
 }
@@ -60,15 +62,12 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   const Icon = getIcon(service.icon)
   const heroImg = service.image_url ? getImageUrl(service.image_url) : 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1920&q=80'
-
-  // WhatsApp fiyat sorma mesajı
-  const whatsappMsg = `Merhaba, ${service.name} hizmeti hakkında fiyat ve detay bilgisi almak istiyorum.`
-  const whatsappLink = `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(whatsappMsg)}`
+  const whatsappLink = `https://wa.me/${COMPANY.whatsapp}?text=${encodeURIComponent(`Merhaba, ${service.name} hizmeti için fiyat bilgisi almak istiyorum.`)}`
 
   return (
     <SiteLayout>
       <PageHeader
-        badge={service.title || 'Hizmet Detayı'}
+        badge={service.title || 'Hizmet'}
         title={service.name}
         description={service.short_description || ''}
         breadcrumbs={[
@@ -81,7 +80,6 @@ export default async function ServiceDetailPage({ params }: Props) {
       <section className="py-16 md:py-20">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            {/* Content */}
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-quvars-soft flex items-center justify-center">
@@ -96,16 +94,17 @@ export default async function ServiceDetailPage({ params }: Props) {
               </div>
 
               {service.content ? (
-                <div className="prose-quvars" dangerouslySetInnerHTML={{ __html: service.content }} />
+                <div
+                  className="prose-quvars"
+                  dangerouslySetInnerHTML={{ __html: service.content }}
+                />
               ) : (
                 <p className="text-gray-600 leading-relaxed text-lg">{service.short_description}</p>
               )}
             </div>
 
-            {/* Sidebar */}
             <aside className="lg:col-span-1">
               <div className="sticky top-24 space-y-6">
-                {/* Quick info card — fiyat YOK */}
                 <div className="p-6 bg-white rounded-3xl shadow-soft border border-lavender-100">
                   <h3 className="text-lg font-heading font-semibold text-lavender-900 mb-4">
                     Hizmet Bilgileri
@@ -132,7 +131,6 @@ export default async function ServiceDetailPage({ params }: Props) {
                   </ul>
                 </div>
 
-                {/* WhatsApp CTA — fiyat sorma odaklı */}
                 <div className="p-6 rounded-3xl bg-gradient-to-br from-green-500 to-green-600 text-white shadow-soft-lg overflow-hidden relative">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
                   <MessageCircle size={32} className="text-white mb-3" />
@@ -140,22 +138,22 @@ export default async function ServiceDetailPage({ params }: Props) {
                   <p className="text-sm text-white/90 mb-4 leading-relaxed">
                     Anlık güncel fiyatlar ve kişiye özel paket teklifleri için WhatsApp'tan bize yazın.
                   </p>
-                  <a
+                  
                     href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full text-center px-5 py-3 bg-white text-green-700 text-sm font-bold rounded-full shadow-soft hover:bg-green-50 transition-all"
+                    className="inline-flex items-center gap-2 px-5 py-3 bg-white text-green-700 text-sm font-semibold rounded-full shadow hover:shadow-lg transition-all w-full justify-center"
                   >
-                    WhatsApp ile Fiyat Al
+                    <MessageCircle size={16} />
+                    <span>WhatsApp'tan Yaz</span>
                   </a>
                 </div>
 
-                {/* Randevu CTA */}
                 <div className="p-6 rounded-3xl bg-gradient-quvars-dark text-white shadow-soft-lg overflow-hidden relative">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-rose-400/20 rounded-full blur-2xl translate-x-1/2 -translate-y-1/2" />
                   <Sparkles size={28} className="text-rose-300 mb-3" />
-                  <h3 className="text-xl font-heading font-medium mb-2">Randevu Al</h3>
-                  <p className="text-sm text-white/80 mb-5">Uzman ekibimizden ücretsiz konsültasyon için randevu oluşturun.</p>
+                  <h3 className="text-xl font-heading font-medium mb-2">Randevu Almak İster Misiniz?</h3>
+                  <p className="text-sm text-white/80 mb-5">Uzman ekibimizden ücretsiz konsültasyon için iletişime geçin.</p>
                   <div className="flex flex-col gap-2">
                     <Link
                       href={`/randevu?hizmet=${service.slug}`}
@@ -164,7 +162,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                       <Calendar size={16} />
                       <span>Randevu Al</span>
                     </Link>
-                    <a
+                    
                       href={`tel:${COMPANY.phoneE164}`}
                       className="inline-flex items-center justify-center gap-2 px-5 py-3 text-white/80 text-sm font-medium hover:text-white transition-colors"
                     >
@@ -177,7 +175,6 @@ export default async function ServiceDetailPage({ params }: Props) {
             </aside>
           </div>
 
-          {/* Related */}
           {related && related.length > 0 && (
             <div className="mt-20">
               <h2 className="text-2xl md:text-3xl font-heading font-medium text-lavender-900 mb-8 text-center">
