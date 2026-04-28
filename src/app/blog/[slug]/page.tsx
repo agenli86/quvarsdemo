@@ -84,7 +84,7 @@ export default async function BlogDetailPage({ params }: Props) {
             className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white mb-6 transition-colors w-fit"
           >
             <ArrowLeft size={16} />
-            <span>Blog'a Dön</span>
+            <span>Blog&apos;a Dön</span>
           </Link>
 
           {post.category && (
@@ -134,7 +134,7 @@ export default async function BlogDetailPage({ params }: Props) {
             <h3 className="text-2xl font-heading font-medium text-lavender-900 mb-3">
               Beğendiniz mi? Bizi takip edin
             </h3>
-            <p className="text-gray-600 mb-5">İlham veren içerikler için Instagram'da bize katılın.</p>
+            <p className="text-gray-600 mb-5">İlham veren içerikler için Instagram&apos;da bize katılın.</p>
             <Link
               href="/randevu"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-quvars text-white text-sm font-semibold rounded-full shadow-soft hover:shadow-glow transition-all"
